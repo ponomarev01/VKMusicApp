@@ -10,22 +10,34 @@ workflows:
         inputs:
         - clone_depth: 1
     - script:
-        title: Проверка структуры
+        title: Подготовка окружения
         inputs:
         - content: |
             #!/bin/bash
             set -ex
-            echo "Содержимое папки:"
+            echo "### Проверка структуры ###"
             ls -la
-            echo "Проверка Xcode проекта:"
-            ls -la VKMusicApp.xcodeproj || true
-    - cocoapods-install:
+            echo "### Содержимое Podfile ###"
+            cat Podfile || true
+            echo "### Версии ###"
+            ruby -v
+            pod --version
+    - cache-pull: {}
+    - script:
+        title: Чистая установка Pods
         inputs:
-        - project_path: "$BITRISE_SOURCE_DIR/VKMusicApp.xcodeproj"
-        - is_update_repo: "yes"
+        - content: |
+            #!/bin/bash
+            set -ex
+            export LANG=en_US.UTF-8
+            export LC_ALL=en_US.UTF-8
+            pod cache clean --all
+            rm -rf ~/.cocoapods/repos
+            pod repo update
+            pod install --verbose
     - xcode-archive:
         inputs:
-        - project_path: "$BITRISE_SOURCE_DIR/VKMusicApp.xcodeproj"
+        - project_path: "$BITRISE_SOURCE_DIR/VKMusicApp.xcworkspace"
         - scheme: "VKMusicApp"
         - export_options_path: "$BITRISE_SOURCE_DIR/ExportOptions.plist"
 
