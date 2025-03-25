@@ -13,3 +13,6 @@ DerivedData/
 Pods/
 !Podfile
 !Podfile.lock
+DerivedData/
+Pods/
+*.xcworkspace
