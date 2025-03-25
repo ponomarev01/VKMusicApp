@@ -6,40 +6,30 @@ workflows:
   primary:
     steps:
     - activate-ssh-key: {}
-    - git-clone:
-        inputs:
-        - clone_depth: 1
+    - git-clone: {}
+    
+    # Настройка для Apple Silicon ▼
     - script:
-        title: Подготовка окружения
+        title: Настройка для M1
         inputs:
         - content: |
-            #!/bin/bash
-            set -ex
-            echo "### Проверка структуры ###"
-            ls -la
-            echo "### Содержимое Podfile ###"
-            cat Podfile || true
-            echo "### Версии ###"
-            ruby -v
-            pod --version
+            arch -arm64 gem install cocoapods -v 1.11.3
+            arch -arm64 pod setup
+            
     - cache-pull: {}
+    
+    # Установка Pods с Rosetta ▼
     - script:
-        title: Чистая установка Pods
+        title: Установка Pods
         inputs:
         - content: |
-            #!/bin/bash
-            set -ex
             export LANG=en_US.UTF-8
-            export LC_ALL=en_US.UTF-8
-            pod cache clean --all
-            rm -rf ~/.cocoapods/repos
-            pod repo update
-            pod install --verbose
+            arch -arm64 pod install --repo-update --verbose
+            
     - xcode-archive:
         inputs:
         - project_path: "$BITRISE_SOURCE_DIR/VKMusicApp.xcworkspace"
         - scheme: "VKMusicApp"
-        - export_options_path: "$BITRISE_SOURCE_DIR/ExportOptions.plist"
 
 app:
   envs:
