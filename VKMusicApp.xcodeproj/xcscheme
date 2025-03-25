@@ -1,0 +1,3 @@
+git add [Ваш_проект].xcodeproj/xcshareddata/xcschemes/*
+git commit -m "Add shared scheme for CI"
+git push
