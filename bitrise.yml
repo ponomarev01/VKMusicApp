@@ -5,31 +5,32 @@ project_type: ios
 workflows:
   primary:
     steps:
-    - activate-ssh-key:
-        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+    - activate-ssh-key: {}
     - git-clone: {}
-    - cache-pull: {}
     - script:
-        title: Установка CocoaPods
+        title: Установка Ruby и CocoaPods
         inputs:
         - content: |
             #!/bin/bash
             set -ex
-            gem install cocoapods --user-install
+            brew install rbenv
+            rbenv install 3.2.2
+            rbenv global 3.2.2
+            gem install cocoapods -v 1.15.2
             pod repo update
-            pod install
+    - cache-pull: {}
+    - cocoapods-install:
+        inputs:
+        - is_update_repo: "yes"
     - xcode-archive:
         inputs:
         - project_path: "$BITRISE_PROJECT_PATH"
         - scheme: "$BITRISE_SCHEME"
-        - configuration: Release
-        - export_method: development  # Или app-store для публикации
-    - deploy-to-bitrise-io:
-        inputs:
-        - deploy_path: "$BITRISE_IPA_PATH"
-    - cache-push: {}
+        - export_options_path: "./ExportOptions.plist"
+    - deploy-to-bitrise-io: {}
 
 app:
   envs:
-  - BITRISE_PROJECT_PATH: VKMusicApp.xcodeproj
-  - BITRISE_SCHEME: VKMusicApp
+  - BITRISE_PROJECT_PATH: "VKMusicApp.xcodeproj"
+  - BITRISE_SCHEME: "VKMusicApp"
+  - BITRISE_XCODE_PROJECT_DIR: "$BITRISE_SOURCE_DIR"
