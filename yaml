@@ -1,0 +1,17 @@
+name: Build IPA
+on: [push]
+jobs:
+  build:
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install CocoaPods
+      run: pod install
+    - name: Build IPA
+      run: |
+        xcodebuild archive -workspace VKMusicApp.xcworkspace -scheme VKMusicApp -archivePath $PWD/build/VKMusicApp.xcarchive
+        xcodebuild -exportArchive -archivePath $PWD/build/VKMusicApp.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath $PWD/build
+    - uses: actions/upload-artifact@v2
+      with:
+        name: VKMusicApp.ipa
+        path: build/VKMusicApp.ipa
