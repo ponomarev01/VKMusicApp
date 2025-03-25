@@ -5,10 +5,9 @@ project_type: ios
 workflows:
   primary:
     steps:
-    - activate-ssh-key: {}
     - git-clone:
         inputs:
-        - clone_depth: 1
+        - repository_url: "https://github.com/ваш-логин/VKMusicApp.git"
     - script:
         title: Подготовка окружения
         inputs:
