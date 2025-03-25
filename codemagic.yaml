@@ -1,0 +1,43 @@
+# codemagic.yaml - конфигурация для сборки в Codemagic
+workflows:
+  ios-workflow:
+    name: VK Music App Build
+    environment:
+      vars:
+        BUNDLE_ID: "com.yourname.VKMusicApp"  # Замените на ваш Bundle ID
+        XCODE_WORKSPACE: "VKMusicApp.xcworkspace"
+        XCODE_SCHEME: "VKMusicApp"
+        FLUTTER_ROOT: "/Users/builder/flutter"  # Только если есть Flutter-часть
+      xcode: latest  # Используем последнюю версию Xcode
+      cocoapods: default  # Версия CocoaPods будет автоматическая
+    scripts:
+      - name: Установка зависимостей
+        script: |
+          # Убедимся, что CocoaPods установлен
+          gem install cocoapods --user-install
+          # Обновляем репозитории CocoaPods
+          pod repo update
+          # Устанавливаем зависимости
+          pod install
+      - name: Сборка IPA
+        script: |
+          # Собираем архив
+          xcodebuild archive \
+            -workspace "$XCODE_WORKSPACE" \
+            -scheme "$XCODE_SCHEME" \
+            -archivePath build/VKMusicApp.xcarchive \
+            -destination generic/platform=iOS \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
+          # Экспортируем IPA
+          xcodebuild -exportArchive \
+            -archivePath build/VKMusicApp.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist exportOptions.plist
+    artifacts:
+      - build/ios/ipa/*.ipa  # Сохраняем собранный IPA
+      - logs  # Сохраняем логи сборки
+    publishing:
+      email:
+        recipients:
+          - your.email@example.com  # Замените на ваш email
