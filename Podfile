@@ -1,9 +1,9 @@
 platform :ios, '14.0'
 use_frameworks!
 
-# Добавьте эту строку (путь относительно Podfile)
-project './VKMusicApp.xcodeproj'  # Важно: './' в начале!
+# Явное указание пути к проекту
+project 'VKMusicApp/VKMusicApp.xcodeproj'
 
 target 'VKMusicApp' do
-  pod 'VK-ios-sdk'
+  pod 'VK-ios-sdk', '~> 1.6'
 end
